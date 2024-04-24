@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="static/style.css" rel="stylesheet" type="text/css"/>
+    <script defer src="static/index.js" type="text/javascript"></script>
+    <script defer src="static/alpine-3-x-x.min.js" type="text/javascript"></script>
+    <title>sharea</title>
+</head>
+
+<body>
+
+<div class="card">
+    <h2>Storage is hosted on server:</h2>
+    <p>Name: {{.Name}}</p>
+    <p>IP: {{.IP}}</p>
+    <p>Storage capacity: {{.Capacity}}</p>
+</div>
+
+<div class="card" x-data="{ tab: 'upload' }">
+    <nav style="margin-bottom: 2rem">
+        <ul class="nav-links">
+            <li>
+                <button :class="{'active': tab === 'upload'}" @click="tab = 'upload'">Upload</button>
+            </li>
+            <li>
+                <button :class="{'active': tab === 'download'}" @click="tab = 'download'">Download</button>
+            </li>
+        </ul>
+    </nav>
+
+    <div @dragover.prevent @drop="handleDrop" x-data="uploadState" x-show="tab === 'upload'">
+        <h2 style="margin-bottom: 1rem">Select your files to upload</h2>
+        <div class="drop-area">
+            Drag & Drop files here or
+            <input
+                    @change="handleSelect"
+                    multiple
+                    style="visibility: hidden; height: 1px"
+                    type="file"
+                    x-ref="fileInput"
+            />
+            <button @click="$refs.fileInput.click()" class="button--outline">
+                Select files
+            </button>
+        </div>
+
+        <div x-show="filesToUpload.length > 0">
+            <h2>Selected Files:</h2>
+            <ul class="selected-list">
+                <template :key="file.name" x-for="file in filesToUpload">
+                    <li class="selected-list-item">
+                        <span x-text="file.name + ' ' + formatBytes(file.size)"></span>
+                        <!--                        <button-->
+                        <!--                                class="remove-button"-->
+                        <!--                                @click="handleRemove(file.name)"-->
+                        <!--                        >-->
+                        <!--                            x-->
+                        <!--                        </button>-->
+                    </li>
+                </template>
+            </ul>
+            <button @click="handleBatchUpload" class="button">
+                <span class="spinner" x-show="filesUploadingCount > 0"></span> Upload Files
+            </button>
+        </div>
+
+    </div>
+
+    <div x-data="downloadState" x-init="listen" x-show="tab === 'download'">
+        <h2>Download files (<span x-text="filesToDownload.length"></span>)</h2>
+
+        <!--        <input-->
+        <!--                class="input search-input"-->
+        <!--                x-show="filesList.length > 0"-->
+        <!--                x-model="search"-->
+        <!--                placeholder="Filter files..."-->
+        <!--        />-->
+
+        <ul class="download-list">
+            <template :key="file.name" x-for="file in filesToDownload">
+                <li class="download-list-item">
+                    <div class="download-list-item-info">
+                        <div x-text="file.name"></div>
+                        <div
+                                class="download-list-item-info-data"
+                                x-text="file.size + ', ' + file.formattedModTime"></div>
+                    </div>
+                    <a :href="file.downloadLink" class="download-list-item-link">
+                        <svg
+                                fill="none"
+                                height="30"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="1.5"
+                                viewBox="0 0 24 24"
+                                width="30"
+                                xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                            <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/>
+                            <path d="M7 11l5 5l5 -5"/>
+                            <path d="M12 4l0 12"/>
+                        </svg>
+                    </a>
+                </li>
+            </template>
+        </ul>
+    </div>
+
+</div>
+
+</body>
+</html>
