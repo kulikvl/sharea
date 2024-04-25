@@ -63,6 +63,7 @@ document.addEventListener("alpine:init", () => {
     Alpine.data("uploadState", () => ({
         filesToUpload: [],
 
+        // Simple FSM I guess?
         uploadStatus: "ready", // "ready" | "uploading" | "uploaded" | "error"
         updateStatus() {
             switch (this.uploadStatus) {

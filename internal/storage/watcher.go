@@ -3,18 +3,20 @@ package storage
 import (
 	"fmt"
 	"github.com/fsnotify/fsnotify"
+	"log"
 )
 
 // Watch watches storage directory on the specified path and calls onChange when storage changes.
-func (s *Storage) Watch(storageChange chan<- string) {
+func (s *Storage) Watch(storageChange chan<- string) error {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		fmt.Println("ERROR CREATING NEW WATCHER")
+		return fmt.Errorf("failed to create new watcher: %w", err)
 	}
+
 	defer func(watcher *fsnotify.Watcher) {
 		err := watcher.Close()
 		if err != nil {
-			fmt.Println("ERROR WATCHER CLOSE")
+			log.Println("Error closing watcher")
 		}
 	}(watcher)
 
@@ -23,7 +25,7 @@ func (s *Storage) Watch(storageChange chan<- string) {
 			select {
 			case event, ok := <-watcher.Events:
 				if !ok {
-					fmt.Println("EVENT NOT OK")
+					log.Println("Watcher event was not ok")
 					return
 				}
 				msg := fmt.Sprintf("Event: %s\n", event)
@@ -40,21 +42,20 @@ func (s *Storage) Watch(storageChange chan<- string) {
 					msg += fmt.Sprintf("Renamed file: %s\n", event.Name)
 				}
 
-				//onChange()
 				storageChange <- msg
 			case err, ok := <-watcher.Errors:
 				if !ok {
-					fmt.Println("WATCHER ERRORS")
+					log.Println("Watcher error event was not ok")
 					return
 				}
-				fmt.Println("ERROR:", err)
+				log.Println("Watcher error:", err)
 			}
 		}
 	}()
 
 	err = watcher.Add(s.Path)
 	if err != nil {
-		fmt.Println("ERROR WATCHER ADD")
+		log.Printf("Failed to add path %s to watcher", s.Path)
 	}
 
 	select {}

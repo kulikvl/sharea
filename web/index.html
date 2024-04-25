@@ -6,7 +6,7 @@
     <link href="static/style.css" rel="stylesheet" type="text/css"/>
     <script defer src="static/index.js" type="text/javascript"></script>
     <script defer src="static/alpine-3-x-x.min.js" type="text/javascript"></script>
-    <title>sharea</title>
+    <title>Sharea</title>
 </head>
 <body>
 
@@ -75,11 +75,10 @@
         </div>
 
         <div class="upload-progress-container" x-show="uploadStatus === 'uploading'">
-            <progress class="upload-progress-bar" id="uploadProgressBar" max="100" value="5"></progress>
+            <progress class="upload-progress-bar" id="uploadProgressBar" max="100" value="0"></progress>
             <div class="upload-progress-stats">
-                <p>Uploading <span x-text="uploadStats.totalCount - uploadStats.uploadedCount"></span> files at speed
-                    <span
-                            x-text="formatBytes(uploadStats.speed) + '/s'"></span></p>
+                <p>Uploading <span x-text="uploadStats.totalCount - uploadStats.uploadedCount"></span>
+                    files at speed <span x-text="formatBytes(uploadStats.speed) + '/s'"></span></p>
                 <p><span x-text="formatBytes(uploadStats.uploadedSize)"></span> / <span
                         x-text="formatBytes(uploadStats.totalSize)"></span></p>
             </div>

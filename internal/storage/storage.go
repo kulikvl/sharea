@@ -9,15 +9,14 @@ import (
 
 type Storage struct {
 	Path     string
-	Capacity int64 // available space in bytes
+	Capacity int64 // available storage space in bytes
 }
 
 type FileInfo struct {
-	Name         string `json:"name"`
-	Size         int64  `json:"size"`
-	DownloadLink string `json:"downloadLink"`
-	//FormattedModTime string    `json:"formattedModTime"`
-	ModTime time.Time `json:"modTime"`
+	Name         string    `json:"name"`
+	Size         int64     `json:"size"`
+	DownloadLink string    `json:"downloadLink"`
+	ModTime      time.Time `json:"modTime"`
 }
 
 func (s *Storage) GetFilesInfo() ([]FileInfo, error) {
@@ -42,8 +41,7 @@ func (s *Storage) GetFilesInfo() ([]FileInfo, error) {
 			Name:         file.Name(),
 			Size:         fileInfo.Size(),
 			DownloadLink: fmt.Sprintf("/api/download/%s", file.Name()),
-			//FormattedModTime: utils.FormatDate(fileInfo.ModTime()),
-			ModTime: fileInfo.ModTime(),
+			ModTime:      fileInfo.ModTime(),
 		})
 	}
 

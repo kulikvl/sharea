@@ -14,20 +14,10 @@ func (s *Server) setupRoutes() {
 			hostname = "unknown"
 		}
 
-		availSpace, err := s.Storage.CalculateAvailableSpace()
-		if err != nil {
-			availSpace = 0
-		}
-
 		return c.Render("index", fiber.Map{
-			"Name":              hostname,
-			"IP":                s.IP,
-			"CapacityAvailable": availSpace,
-			"Capacity":          s.Storage.Capacity,
+			"Name":     hostname,
+			"IP":       s.IP,
+			"Capacity": s.Storage.Capacity,
 		})
-	})
-
-	s.App.Get("/test", func(c *fiber.Ctx) error {
-		return c.Render("test", fiber.Map{})
 	})
 }

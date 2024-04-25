@@ -25,14 +25,12 @@ func (s *Server) setupWebSockets() {
 
 	s.App.Get("/ws/files", websocket.New(func(c *websocket.Conn) {
 		defer func() {
-			log.Println("Bye Bye client: ", c.IP())
 			err := c.Close()
 			if err != nil {
 				log.Println("Failed to close connection with the client: ", c.IP())
 			}
 		}()
 
-		log.Println("New WS client: ", c.IP())
 		clients[c] = true
 		storageChange <- "new client!"
 
@@ -40,7 +38,7 @@ func (s *Server) setupWebSockets() {
 			_, _, err := c.ReadMessage()
 			if err != nil {
 				if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway, websocket.CloseNoStatusReceived) {
-					log.Println("WebSocket closed normally for client: ", c.IP())
+					//log.Println("WebSocket closed normally for client: ", c.IP())
 				} else {
 					log.Println("Failed to read message from the client:", err)
 				}
