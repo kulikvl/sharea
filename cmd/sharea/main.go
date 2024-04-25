@@ -26,7 +26,7 @@ func RootCmd() *cobra.Command {
 				}
 			}
 
-			serv, err := server.New(port, path, 1000)
+			serv, err := server.New(port, path, 1*1024*1024*1024)
 			if err != nil {
 				return fmt.Errorf("failed to create a server: %w", err)
 			}

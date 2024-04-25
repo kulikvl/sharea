@@ -8,18 +8,20 @@
     <script defer src="static/alpine-3-x-x.min.js" type="text/javascript"></script>
     <title>sharea</title>
 </head>
-
 <body>
 
-<div class="card">
+<div class="card" x-data="serverState">
     <h2>Storage is hosted on server:</h2>
-    <p>Name: {{.Name}}</p>
-    <p>IP: {{.IP}}</p>
-    <p>Storage capacity: {{.Capacity}}</p>
+    <p>{{.Name}}@{{.IP}}</p>
+    <p>Available
+        <span x-text="formatBytes({{.Capacity}} - storageOccupiedBytes)"></span>
+        out of
+        <span x-text="formatBytes({{.Capacity}})"></span>
+    </p>
 </div>
 
 <div class="card" x-data="{ tab: 'upload' }">
-    <nav style="margin-bottom: 2rem">
+    <nav>
         <ul class="nav-links">
             <li>
                 <button :class="{'active': tab === 'upload'}" @click="tab = 'upload'">Upload</button>
@@ -30,80 +32,90 @@
         </ul>
     </nav>
 
-    <div @dragover.prevent @drop="handleDrop" x-data="uploadState" x-show="tab === 'upload'">
-        <h2 style="margin-bottom: 1rem">Select your files to upload</h2>
-        <div class="drop-area">
-            Drag & Drop files here or
-            <input
-                    @change="handleSelect"
-                    multiple
-                    style="visibility: hidden; height: 1px"
-                    type="file"
-                    x-ref="fileInput"
-            />
-            <button @click="$refs.fileInput.click()" class="button--outline">
-                Select files
+    <div x-data="uploadState" x-show="tab === 'upload'">
+
+        <div x-show="uploadStatus === 'ready'">
+            <h2>Select your files to upload</h2>
+            <div @dragover.prevent @drop="handleDrop" class="drop-area">
+                Drag & Drop files here or
+                <input
+                        @change="handleSelect"
+                        multiple
+                        style="visibility: hidden; height: 1px"
+                        type="file"
+                        x-ref="fileInput"
+                />
+                <button @click="$refs.fileInput.click()" class="button-outline">
+                    Select files
+                </button>
+            </div>
+
+            <div x-show="filesToUpload.length > 0">
+                <h2>Selected Files:</h2>
+                <ul class="file-list">
+                    <template :key="file.name" x-for="file in filesToUpload">
+                        <li class="file-list-item">
+                            <div class="file-list-item-info">
+                                <p x-text="file.name"></p>
+                                <p class="file-list-item-info-detail" x-text="formatBytes(file.size)"></p>
+                            </div>
+
+                            <button
+                                    @click="handleRemove(file.name)"
+                                    class="remove-button"
+                            >
+                            </button>
+                        </li>
+                    </template>
+                </ul>
+                <button @click="handleBatchUpload" class="button-default">
+                    Upload files
+                </button>
+            </div>
+        </div>
+
+        <div class="upload-progress-container" x-show="uploadStatus === 'uploading'">
+            <progress class="upload-progress-bar" id="uploadProgressBar" max="100" value="5"></progress>
+            <div class="upload-progress-stats">
+                <p>Uploading <span x-text="uploadStats.totalCount - uploadStats.uploadedCount"></span> files at speed
+                    <span
+                            x-text="formatBytes(uploadStats.speed) + '/s'"></span></p>
+                <p><span x-text="formatBytes(uploadStats.uploadedSize)"></span> / <span
+                        x-text="formatBytes(uploadStats.totalSize)"></span></p>
+            </div>
+        </div>
+
+        <div class="upload-result-container" x-show="uploadStatus === 'uploaded'">
+            <h2>Uploaded <span x-text="uploadStats.uploadedCount"></span> files of total size <span
+                    x-text="formatBytes(uploadStats.uploadedSize)"></span> in <span
+                    x-text="uploadStats.totalTime"></span> seconds</h2>
+            <button @click="handleUploadMore" class="button-default">
+                Upload more
             </button>
         </div>
 
-        <div x-show="filesToUpload.length > 0">
-            <h2>Selected Files:</h2>
-            <ul class="selected-list">
-                <template :key="file.name" x-for="file in filesToUpload">
-                    <li class="selected-list-item">
-                        <span x-text="file.name + ' ' + formatBytes(file.size)"></span>
-                        <!--                        <button-->
-                        <!--                                class="remove-button"-->
-                        <!--                                @click="handleRemove(file.name)"-->
-                        <!--                        >-->
-                        <!--                            x-->
-                        <!--                        </button>-->
-                    </li>
-                </template>
-            </ul>
-            <button @click="handleBatchUpload" class="button">
-                <span class="spinner" x-show="filesUploadingCount > 0"></span> Upload Files
+        <div class="upload-result-container" x-show="uploadStatus === 'error'">
+            <h2 style="color: #d02828">Error happened while uploading one or more files</h2>
+            <p>The error was "<span x-text="uploadStats.error"></span>". Check console for detailed error message</p>
+            <button @click="handleUploadMore" class="button-default">
+                Upload more
             </button>
         </div>
 
     </div>
 
-    <div x-data="downloadState" x-init="listen" x-show="tab === 'download'">
+    <div x-data="downloadState" x-show="tab === 'download'">
         <h2>Download files (<span x-text="filesToDownload.length"></span>)</h2>
 
-        <!--        <input-->
-        <!--                class="input search-input"-->
-        <!--                x-show="filesList.length > 0"-->
-        <!--                x-model="search"-->
-        <!--                placeholder="Filter files..."-->
-        <!--        />-->
-
-        <ul class="download-list">
+        <ul class="file-list">
             <template :key="file.name" x-for="file in filesToDownload">
-                <li class="download-list-item">
-                    <div class="download-list-item-info">
-                        <div x-text="file.name"></div>
-                        <div
-                                class="download-list-item-info-data"
-                                x-text="file.size + ', ' + file.formattedModTime"></div>
+                <li class="file-list-item">
+                    <div class="file-list-item-info">
+                        <p x-text="file.name"></p>
+                        <p class="file-list-item-info-detail"
+                           x-text="formatBytes(file.size) + ', ' + formatDate(file.modTime)"></p>
                     </div>
-                    <a :href="file.downloadLink" class="download-list-item-link">
-                        <svg
-                                fill="none"
-                                height="30"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.5"
-                                viewBox="0 0 24 24"
-                                width="30"
-                                xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                            <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/>
-                            <path d="M7 11l5 5l5 -5"/>
-                            <path d="M12 4l0 12"/>
-                        </svg>
-                    </a>
+                    <a :href="file.downloadLink" class="download-link"></a>
                 </li>
             </template>
         </ul>

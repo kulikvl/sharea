@@ -54,6 +54,7 @@ body {
     display: flex;
     justify-content: center;
     gap: 1rem;
+    margin-bottom: 2rem;
 }
 
 .nav-links li {
@@ -88,7 +89,7 @@ body {
     width: 100%;
 }
 
-.button {
+.button-default {
     display: flex;
     gap: 0.7rem;
     padding: 0.6rem 1.3rem;
@@ -100,11 +101,11 @@ body {
     transition: background-color 0.3s ease;
 }
 
-.button:hover {
+.button-default:hover {
     background-color: var(--color-background-primary-highlighted);
 }
 
-.button--outline {
+.button-outline {
     display: flex;
     gap: 0.7rem;
     padding: 0.6rem 1.3rem;
@@ -116,7 +117,7 @@ body {
     transition: color 0.3s ease, border-color 0.3s ease;
 }
 
-.button--outline:hover {
+.button-outline:hover {
     color: var(--color-border-primary-highlighted);
     border-color: var(--color-border-primary-highlighted);
 }
@@ -134,99 +135,113 @@ body {
     gap: 0.5rem;
 }
 
-.selected-list {
-    list-style-type: none;
-    padding: 0;
+.remove-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 15px 15px;
+    background-image: url("remove-button.svg");
+    background-size: cover;
 }
 
-.selected-list-item {
+.file-list {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.file-list-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border: 0.1rem solid #ccc;
+    border: 0.1rem solid var(--color-border-neutral);
     border-radius: 0.5rem;
     margin-bottom: 0.5rem;
     padding: 0.8rem;
 }
 
-.remove-button {
-    background-color: var(--color-background-critical);
-    color: var(--color-on-background-critical);
-    border: none;
-    border-radius: 50%;
-    padding: 0.5rem;
-    cursor: pointer;
-    width: 2.5rem;
-    height: 2.5rem;
-    line-height: 1;
-}
-
-.download-list {
-    list-style-type: none;
-    /*padding: 0;*/
-    /*border-top: 0.1rem solid var(--color-border-neutral);*/
-    /*margin: 1rem;*/
-    /*font-size: 1.6rem;*/
-}
-
-.download-list-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 0.1rem solid var(--color-border-neutral);
-    padding: 1rem;
-}
-
-.download-list-item-info {
+.file-list-item-info {
     display: flex;
     text-align: left;
     flex-direction: column;
     gap: 0rem;
 }
 
-.download-list-item-info-data {
+.file-list-item-info-detail {
     color: var(--color-foreground-neutral-faded);
-    /*font-size: 1.4rem;*/
 }
 
-.download-list-item-link {
-    stroke: var(--color-background-primary);
+.download-link {
+    background-color: transparent;
     border: none;
     cursor: pointer;
-    background-color: transparent;
+    padding: 15px 15px;
+    background-image: url("download-button.svg");
+    background-size: cover;
 }
 
+/*.download-list-item-info {*/
+/*    display: flex;*/
+/*    text-align: left;*/
+/*    flex-direction: column;*/
+/*    gap: 0rem;*/
+/*}*/
 
-.progress-bar {
-    width: 0%;
+/*.download-list-item-info-data {*/
+/*    color: var(--color-foreground-neutral-faded);*/
+/*    !*font-size: 1.4rem;*!*/
+/*}*/
+
+/*.download-list-item-link {*/
+/*    stroke: var(--color-background-primary);*/
+/*    border: none;*/
+/*    cursor: pointer;*/
+/*    background-color: transparent;*/
+/*}*/
+
+/* upload progress */
+
+.upload-progress-container {
+    margin: 3rem 2rem;
+}
+
+.upload-progress-bar {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
     height: 20px;
-    background-color: blue;
-    color: white;
-    text-align: center;
 }
 
-/* Utils */
-
-.spinner {
-    transform: translateY(-50%);
-    border: 0.3rem solid rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    border-top: 0.3rem solid white;
-    width: 1.5rem;
-    height: 1.5rem;
-    animation: spin 1s linear infinite;
-    display: inline-block;
+.upload-progress-stats {
+    display: flex;
+    justify-content: space-between;
 }
 
-.file-list__title {
-    margin: 5rem 1rem 0;
+/* upload result */
+
+.upload-result-container {
+    margin: 3rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
 }
 
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+/* modify built-in css */
+
+h2 {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
 }
+
+progress::-webkit-progress-bar {
+    background-color: #eee;
+    border-radius: 10px;
+}
+
+progress::-webkit-progress-value {
+    background: linear-gradient(to right, #6a5acd, #836fff);
+    border-radius: 10px;
+}
+

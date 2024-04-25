@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"log"
 	"net"
 )
 
@@ -20,7 +21,9 @@ func GetLocalIp() (string, error) {
 		return "", fmt.Errorf("type assert failed")
 	}
 
-	connection.Close()
+	if err := connection.Close(); err != nil {
+		log.Printf("Error while closing connection for GetLocalIp(): %s", err)
+	}
 
 	return localAddr.IP.String(), nil
 }

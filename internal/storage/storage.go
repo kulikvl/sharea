@@ -2,7 +2,6 @@ package storage
 
 import (
 	"fmt"
-	"github.com/kulikvl/sharea/internal/utils"
 	"os"
 	"sort"
 	"time"
@@ -14,11 +13,11 @@ type Storage struct {
 }
 
 type FileInfo struct {
-	Name             string    `json:"name"`
-	Size             string    `json:"size"`
-	DownloadLink     string    `json:"downloadLink"`
-	FormattedModTime string    `json:"formattedModTime"`
-	ModTime          time.Time `json:"-"`
+	Name         string `json:"name"`
+	Size         int64  `json:"size"`
+	DownloadLink string `json:"downloadLink"`
+	//FormattedModTime string    `json:"formattedModTime"`
+	ModTime time.Time `json:"modTime"`
 }
 
 func (s *Storage) GetFilesInfo() ([]FileInfo, error) {
@@ -40,11 +39,11 @@ func (s *Storage) GetFilesInfo() ([]FileInfo, error) {
 		}
 
 		fileInfos = append(fileInfos, FileInfo{
-			Name:             file.Name(),
-			Size:             utils.FormatSize(fileInfo.Size()),
-			DownloadLink:     fmt.Sprintf("/api/download/%s", file.Name()),
-			FormattedModTime: utils.FormatDate(fileInfo.ModTime()),
-			ModTime:          fileInfo.ModTime(),
+			Name:         file.Name(),
+			Size:         fileInfo.Size(),
+			DownloadLink: fmt.Sprintf("/api/download/%s", file.Name()),
+			//FormattedModTime: utils.FormatDate(fileInfo.ModTime()),
+			ModTime: fileInfo.ModTime(),
 		})
 	}
 

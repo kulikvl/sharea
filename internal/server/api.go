@@ -46,9 +46,10 @@ func (s *Server) setupApi() {
 		}
 
 		reader := c.Context().RequestBodyStream()
-		buffer := make([]byte, 0, 10)
+		buffer := make([]byte, 0, 50*1024*1024) // 50 MiB / s
 
 		for {
+			time.Sleep(1 * time.Second)
 			length, err := io.ReadFull(reader, buffer[:cap(buffer)])
 			buffer = buffer[:length]
 
@@ -63,7 +64,7 @@ func (s *Server) setupApi() {
 				}
 			}
 
-			fmt.Printf("Read %d bytes\n", length)
+			//fmt.Printf("Read %d bytes\n", length)
 			if _, err := file.Write(buffer); err != nil {
 				return fmt.Errorf("failed to write %d bytes to file %s: %w", length, filename, err)
 			}
@@ -76,7 +77,7 @@ func (s *Server) setupApi() {
 		fmt.Println("file written successfully!")
 
 		time.Sleep(5 * time.Second)
-		return c.Status(fiber.StatusAccepted).SendString("OK")
+		return c.Status(fiber.StatusAccepted).SendString("File uploaded successfully")
 	})
 
 	api.Get("/download/:filename", func(c *fiber.Ctx) error {
