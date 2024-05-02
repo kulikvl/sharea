@@ -8,7 +8,7 @@ Server (Go):
   - check if it is possible to make more efficient download system
 - test:
   - unit tests where possible
-  - think about mocks
+  - think about mocks for integrations tests
 - config:
   - analyse if embedding a Web FS would be beneficial
 - watcher:
@@ -18,10 +18,10 @@ Server (Go):
 
 Client (JS);
 - js:
-  - refactor index.js. Think of better way of doing things.
+  - refactor and analyse index.js
 - html&css:
   - better styles
 
 Overall:
-- write READ.me
-- learn .goreleaser.yml
+- write README.md
+- write .goreleaser.yml
